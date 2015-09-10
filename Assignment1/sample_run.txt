@@ -1,0 +1,43 @@
+duydo@duydo-Lenovo-H430:~/Documents/323/Assignment1$ g++ main.cpp postfix.cpp
+duydo@duydo-Lenovo-H430:~/Documents/323/Assignment1$ ./a.out 
+Enter a postfix expression with a $ at the end: ab*c+$
+Enter the value for a : 2
+Enter the value for b : 3
+Enter the value for c : 4
+Final value = 10
+Continue(y/n)? y
+Enter a postfix expression with a $ at the end: beef*++$
+Enter the value for b : 2
+Enter the value for e : 3
+Enter the value for f : 4
+Final value = 17
+Continue(y/n)? y
+Enter a postfix expression with a $ at the end: Abde*+ef--+$ 
+Enter the value for A : 1
+Enter the value for b : 2
+Enter the value for d : 3
+Enter the value for e : 4
+Enter the value for f : 5
+Final value = 16
+Continue(y/n)? y
+Enter a postfix expression with a $ at the end: a*bc+$
+ERROR, non-letter detected in first two chars.
+Enter a postfix expression with a $ at the end: ab*
+ERROR, expression is too short.
+Enter a postfix expression with a $ at the end: ab+d*
+ERROR, expression does not end with $.
+Enter a postfix expression with a $ at the end: ab*c$+
+ERROR, expression does not end with $.
+Enter a postfix expression with a $ at the end: ab*c%$
+ERROR, non-letter or non-operator detected.
+Enter a postfix expression with a $ at the end: abcd*+$
+ERROR, the number of operators does not equal the number of operands - 1.
+Enter a postfix expression with a $ at the end: abd5*/+$
+ERROR, non-letter or non-operator detected.
+Enter a postfix expression with a $ at the end: abbbbbe******$
+Enter the value for a : 1
+Enter the value for b : 1
+Enter the value for e : 1
+Final value = 1
+Continue(y/n)? n
+duydo@duydo-Lenovo-H430:~/Documents/323/Assignment1$ 
