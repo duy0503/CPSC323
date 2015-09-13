@@ -11,61 +11,39 @@ bool input_validation(string input);
 void get_variable ( unordered_map<string, int> & variable_map, string w);
 void get_value ( unordered_map<string, int> &variable_map);
 void compute(stack<int> & mystack, char OP);
+int compute_the_expression(unordered_map<string,int> & variable_map, string w);
 
 int main() {
 
-  string w;
-  cout << "Enter the expression: " <<endl;
-  getline(cin, w);
+  string expression;
+  char option = 'y';  /* variable to get option from user, 
+							either continue with another expression or stop */
+  int final_value = 0;
+
+  do {
+
+    cout << "Enter a postfix expression with a $ at the end: ";
+    getline(cin, expression);
+
+    if ( input_validation(expression)) {
+
+      unordered_map<string, int> variable_map;
+      get_variable(variable_map, expression);
+      get_value(variable_map);
+      final_value = compute_the_expression(variable_map, expression);
+      cout << "Final value = " << final_value << endl;
+      cout << "Continue(y/n)? ";
+      cin >> option;
+      cin.ignore();
+    }
+
+  } while (option == 'y');
   
-  if ( input_validation(w) ) cout << "yes" <<endl;
-  else cout << "no"<<endl;
-  string var = "";
-  int number = 0;
-  int i=0;
-  string s;
-  stack<string> mystack;
-  stack<char> myoperator;
-  stack<int> constants;
-  stack<int> compute_stack;
-  unordered_map<string, int> variable_map;
-
-  get_variable(variable_map, w);
-  get_value(variable_map);
-  
-  for ( i = 0; i < w.length(); i++ ) {
-    if ( (int)w[i] >= 48 && (int)w[i] <= 57 ) {
-      while ( (int)w[i] >= 48 && (int)w[i] <= 57 ){
-	number = 10*number + (int)w[i] - '0';
-	i++;
-      }
-      compute_stack.push(number);
-      number = 0;
-    }
-
-    if ( isalpha(w[i]) || w[i] == '_') {
-	while ( isalpha(w[i]) || isdigit(w[i]) || w[i] == '_' ) {
-	  var = var + w[i];
-	  i++;
-	}
-        compute_stack.push(variable_map.at(var));
-	var="";
-      	
-    }
-
-    if ( w[i] =='+' || w[i] == '-' || w[i] == '*' || w[i] == '/' ) {
-      if ( compute_stack.size() > 1 ) {
-	compute(compute_stack, w[i]);
-      }
-    }
-
-  }
-
-  cout << compute_stack.top() <<endl;
   return 0;
 }
 
 bool input_validation(string w) {
+  
  int table[6][6] = { 2, 2, 1, 0, 5, 5,
 		     5, 5, 1, 3, 4, 5,
 		     2, 2, 2, 3, 4, 5,
@@ -78,7 +56,7 @@ bool input_validation(string w) {
 
   while ( i < w.length() )
     {
-      if ( ((int)w[i] >= 65 && (int)w[i] >= 90) || ((int)w[i] >= 97 && (int)w[i] <= 122)) //A-Z, a-z = letterif ( (int)w[i] >=
+      if ( isalpha(w[i]) ) //A-Z, a-z = letterif ( (int)w[i] >=
 	{
 	  Input = letter;
 	}
@@ -86,7 +64,7 @@ bool input_validation(string w) {
 	{
 	  Input = underscore;
 	}
-      else if ( (int)w[i] >= 48 && (int)w[i] <= 57 )
+      else if ( isdigit(w[i]) )
 	{
 	  Input = digit;
 	}
@@ -127,11 +105,11 @@ bool input_validation(string w) {
 	case dollar:
 	  if ( state == 0 || state == 3 || state == 5 )
 	    {
-	    cout << "W is not acceptable"<<endl;
+	    cout << "Expression is not acceptable!"<<endl;
 	    return false;
 	    }
 	  else {
-	    cout << "W is acceptable"<<endl;
+	    cout << "Expression is acceptable!"<<endl;
 	    return true;
 	  }
 	  break;
@@ -149,16 +127,28 @@ void get_variable ( unordered_map<string, int> & variable_map, string w) {
 
   int i = 0;
   string var = "";
+  unordered_map<string, int>::const_iterator found;
   for ( i = 0; i < w.length(); i++ ) {
 
-    if ( isalpha(w[i]) || w[i] == '_') {
+    // Check to see if the current character is a letter or '_',
+    // If it is, then we know this is the start of a variable, use while loop to get all the characters of that variable
+    if ( isalpha(w[i]) || w[i] == '_') { 
       while ( isalpha(w[i]) || isdigit(w[i]) || w[i] == '_' ) {
 	var = var + w[i];
 	i++;
       }
-      variable_map.insert({var, 0});
-      var="";
-      	
+
+      // search the variable_map to see if the variable is already existed in the map,
+      // If it is not, insert the variable to the map
+      
+      found = variable_map.find(var);
+      if ( found == variable_map.end() ){     // var is not in the map
+	
+	variable_map.insert({var, 0});
+	
+      }
+      
+      var="";      	
     }
   }
 }
@@ -167,13 +157,51 @@ void get_value ( unordered_map<string, int> &variable_map) {
 
   int value;
   for ( auto it = variable_map.cbegin(); it != variable_map.cend(); ++it ) {
-    cout << "Enter values for " << it->first << ":"<<endl;
+    cout << "Enter values for " << it->first << ":";
     cin >> value;
     variable_map[it->first] = value;
   }
 
 }
 
+int compute_the_expression(unordered_map<string,int> & variable_map, string w){
+  
+  string var = "";
+  int number = 0;
+  int i=0;
+  stack<int> compute_stack;
+  for ( i = 0; i < w.length(); i++ ) {
+    if ( isdigit(w[i]) ) {
+	while ( isdigit(w[i]) ){
+	number = 10*number + (int)w[i] - '0';
+	i++;
+      }
+      compute_stack.push(number);
+      number = 0;
+    }
+
+    if ( isalpha(w[i]) || w[i] == '_') {
+      while ( isalpha(w[i]) || isdigit(w[i]) || w[i] == '_' ) {
+	var = var + w[i];
+	i++;
+      }
+      compute_stack.push(variable_map.at(var));
+      var="";
+      	
+    }
+
+    if ( w[i] =='+' || w[i] == '-' || w[i] == '*' || w[i] == '/' ) {
+      if ( compute_stack.size() > 1 ) {
+	compute(compute_stack, w[i]);
+      }
+    }
+
+  }
+
+  return compute_stack.top();
+
+
+}
 void compute(stack<int> & mystack, char OP){
   int result = 0;
   int first_op;
