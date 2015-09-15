@@ -11,7 +11,7 @@ bool input_validation(string input);
 void get_variable ( unordered_map<string, int> & variable_map, string w);
 void get_value ( unordered_map<string, int> &variable_map);
 void compute(stack<int> & mystack, char OP);
-int compute_the_expression(unordered_map<string,int> & variable_map, string w);
+int compute_the_expression(unordered_map<string,int> & variable_map, string w, bool* succeeded); 
 
 int main() {
 
@@ -19,6 +19,8 @@ int main() {
   char option = 'y';  /* variable to get option from user, 
 							either continue with another expression or stop */
   int final_value = 0;
+  bool succeeded = true; //this bool will be used in compute_the_expression to see if compute works.
+
   do {
     cout << "Enter a postfix expression with a $ at the end: ";
     getline(cin, expression);
@@ -28,11 +30,17 @@ int main() {
       unordered_map<string, int> variable_map;
       get_variable(variable_map, expression);
       get_value(variable_map);
-      final_value = compute_the_expression(variable_map, expression);
-      cout << "Final value = " << final_value << endl;
-      cout << "Continue(y/n)? ";
-      cin >> option;
-      cin.ignore();
+      final_value = compute_the_expression(variable_map, expression, &succeeded);
+	  if (succeeded) {
+		  cout << "Final value = " << final_value << endl;
+	  }
+	  else
+	  {
+		  cout << "Computational error. Check operator number and placement.\n";
+	  }
+	  cout << "Continue(y/n)? ";
+	  cin >> option;
+	  cin.ignore();
     }
 
   } while (option == 'y');
@@ -51,6 +59,12 @@ bool input_validation(string w) {
 
   int state = 0, i =0, col;
   input Input;
+
+  if (w[w.size() - 1] != '$')
+  {
+	  cout << "Error. Expression is missing $ at end.\n";
+	  return false;
+  }
 
   while ( i < w.length() )
     {
@@ -101,9 +115,9 @@ bool input_validation(string w) {
 	  col = 5;
 	  break;
 	case dollar:
-	  if ( state == 0 || state == 3 || state == 5 )
+	  if (state == 0 || state == 3 || state == 5 || i < w.size() - 1)
 	    {
-	    cout << "Expression is not acceptable!"<<endl;
+	    cout << "Error. $ detected in inappropriate location."<<endl;
 	    return false;
 	    }
 	  else {
@@ -162,7 +176,7 @@ void get_value ( unordered_map<string, int> &variable_map) {
 
 }
 
-int compute_the_expression(unordered_map<string,int> & variable_map, string w){
+int compute_the_expression(unordered_map<string,int> & variable_map, string w, bool* succeeded){
   
   string var = "";
   int number = 0;
@@ -189,17 +203,22 @@ int compute_the_expression(unordered_map<string,int> & variable_map, string w){
     }
 
     if ( w[i] =='+' || w[i] == '-' || w[i] == '*' || w[i] == '/' ) {
-      if ( compute_stack.size() > 1 ) {
-	compute(compute_stack, w[i]);
-      }
+      if ( compute_stack.size() > 1 ) { 
+		  compute(compute_stack, w[i]);
+		}
+	  else *succeeded = false; //if the compute_stack is less than 1, error. 
     }
 
   }
-
+  if (compute_stack.size() > 0)
+  {
+	  *succeeded = false; //if there are any variables left in the stack at the end of the function, error.
+  }
   return compute_stack.top();
 
 
 }
+
 void compute(stack<int> & mystack, char OP){
   int result = 0;
   int first_op;
@@ -236,5 +255,4 @@ void compute(stack<int> & mystack, char OP){
       mystack.push(second_op);
       break;
     }
-
 }
