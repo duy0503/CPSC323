@@ -18,6 +18,14 @@ Function: main
 Input: None
 Output: None
 Description: Main function.
+Program executes the following steps:
+1. Prompts user input for string expression.
+2. Processes expression through input_validation.
+3. If validated, uses get_variable to place each unique variable from the expression into the unordered map
+4. Uses get_value to ask user for values of each unique variable
+5. compute_the_expression computes the value of the expression, or sets the bool succeeded to false if an error occurs.
+6. Output the final value, if succeeded is true.
+7. Ask user if they want to continue.
 
 */
 
