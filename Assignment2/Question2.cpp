@@ -19,9 +19,7 @@ int main() {
   char option = 'y';  /* variable to get option from user, 
 							either continue with another expression or stop */
   int final_value = 0;
-
   do {
-
     cout << "Enter a postfix expression with a $ at the end: ";
     getline(cin, expression);
 
