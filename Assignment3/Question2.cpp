@@ -50,7 +50,7 @@ void process(string w)
 	{
 		cout << "String " << w << " is accepted by grammar.\n";
 	}
-	else cout << "String << w << " "is not accepted by grammar.\n";
+	else cout << "String " << w << "is not accepted by grammar.\n";
 }
 
 int main()
