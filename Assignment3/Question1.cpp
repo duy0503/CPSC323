@@ -13,7 +13,7 @@ int main() {
   int i, j;
   bool not_id = false;
   bool reserved = false;
-  string w = "for(int tom_jones=22;tom_jones<=100;tom_jones=tom+1)cout<< 2tom;";
+  string w = "for(int tom_jones=22;tom_jones<=100;tom_jones=tom+1)cout<<2tom;";
 
   for ( i = 0; i < w.length(); i++ ) {
 
@@ -52,7 +52,10 @@ int main() {
 	//check the next two character to see if they are "<<"
 	if ( w[i] == '<' && w[i+1] == '<' ) {
 	  var = var + "<<";
-	  i = i + 2;
+	  cout << var <<"\t\treserved word"<<endl;
+	  i++;
+	  var = "";
+	  continue;
 	}
       }
       // Check if var is a reserved word
