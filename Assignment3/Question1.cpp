@@ -1,20 +1,50 @@
 #include <iostream>
 #include <string>
 #include <ctype.h>
+#include <vector>
+#include <stdlib.h>
+#include <cstring>
 
 using namespace std;
 
-const string Reserved_Word[4] = {"cout<<", "for", "int", "while"};
-const string Special[8] = {"=", "+", "-", "*", ";", "(", ")", "<="};
+const int TOTAL_RESERVED_WORD = 4;
+const int TOTAL_SPECIAL  = 7;
+const string Reserved_Word[TOTAL_RESERVED_WORD] = {"cout<<", "for", "int", "while"};
+const string Special[TOTAL_SPECIAL] = {"=", "_", "*", ";", "(", ")", "<="};
 
-int main() {
+void get_tokens(string w, vector<int> & number, vector<string> &identifier, vector<string> &reserved_word, vector<string> &special_symbol, vector<char> &operators);
+
+int main() { 
+  char option = 'y';  /* variable to get option from user, 
+							either continue with another expression or stop */
+  string statement = "";
+  vector<int> number;
+  vector<string> identifier;
+  vector<string> reserved_word;
+  vector<string> special_symbol;
+  vector<char> operators;
+  
+  do {
+    cout << "Enter a statement: ";
+    getline(cin, statement);
+
+    get_tokens(statement, number, identifier, reserved_word, special_symbol, operators);
+
+    cout << "Continue(y/n)? ";
+    cin >> option;
+    cin.ignore();
+  } while (option == 'y');
+
+  return 0;
+}
+
+void get_tokens(string w, vector<int> & number, vector<string> &identifier, vector<string> &reserved_word, vector<string> &special_symbol, vector<char> &operators) {
 
   string var = "";
   int i, j;
   bool not_id = false;
   bool reserved = false;
-  string w = "for(int tom_jones=22;tom_jones<=100;tom_jones=tom+1)cout<<2tom;";
-
+  
   for ( i = 0; i < w.length(); i++ ) {
 
     // w[i] is a number
@@ -36,7 +66,10 @@ int main() {
 	cout << var <<"\t\tnot identifier"<<endl;
 	not_id = false;
       }
-      else cout << var <<"\t\tnumber"<<endl;
+      else {
+	cout << var <<"\t\tnumber"<<endl;
+	number.push_back(atoi(var.c_str()));
+      }
       var = "";
     }
 
@@ -53,21 +86,28 @@ int main() {
 	if ( w[i] == '<' && w[i+1] == '<' ) {
 	  var = var + "<<";
 	  cout << var <<"\t\treserved word"<<endl;
+	  reserved_word.push_back(var);
 	  i++;
 	  var = "";
 	  continue;
 	}
       }
       // Check if var is a reserved word
-      for ( j = 0; j < 4; j++ ) {
+      for ( j = 0; j < TOTAL_RESERVED_WORD; j++ ) {
 	if ( var == Reserved_Word[j] ) {
 	  reserved = true;
 	  break;
 	}
       }
 
-      if ( reserved ) cout << var <<"\t\treserved word"<<endl;
-      else cout << var <<"\t\tidentifier"<<endl;
+      if ( reserved ) {
+	cout << var <<"\t\treserved word"<<endl;
+	reserved_word.push_back(var);
+      }
+      else {
+	cout << var <<"\t\tidentifier"<<endl;
+	identifier.push_back(var);
+      }
 
       reserved = false;
       var = "";
@@ -80,22 +120,27 @@ int main() {
       if ( w[i] == '=' ) {
 	var = var + w[i];
 	cout << var <<"\t\tspecial symbol"<<endl;
+	special_symbol.push_back(var);
       }
       else cout << var <<"\t\tnot special symbol"<<endl;
-
+      
       var = "";
-    }
-    
-    else {
-      for ( j = 0; j < 7; j++ ) {
+    }  else {
+      for ( j = 0; j < TOTAL_SPECIAL; j++ ) {
 	if ( w[i] == Special[j][0] ) {
 	  cout << w[i] <<"\t\tspecial symbol"<<endl;
+	  special_symbol.push_back(var);
 	  break;
 	}
       }
     }
+
+    // Check for operator
+    if ( w[i] == '+' || w[i] == '-' || w[i] == '*' || w[i] == '/' ) {
+      cout << w[i] <<"\t\toperator"<<endl;
+      operators.push_back(w[i]);
+    }
       
   }
 
-  return 0;
 }
