@@ -1,3 +1,13 @@
+/*
+  Author Name: Duy Do, Tetsuya Tanaka
+  Course: CPSC 323
+  Assignment 3
+  Question 1
+  Due Date: 09/24/2015
+  Project Information: Read a statement and determine whether each token is a number, identifier, a reserved word, or special character
+
+ */
+
 #include <iostream>
 #include <string>
 #include <ctype.h>
@@ -12,7 +22,37 @@ const int TOTAL_SPECIAL  = 7;
 const string Reserved_Word[TOTAL_RESERVED_WORD] = {"cout<<", "for", "int", "while"};
 const string Special[TOTAL_SPECIAL] = {"=", "_", "*", ";", "(", ")", "<="};
 
-void get_tokens(string w, vector<int> & number, vector<string> &identifier, vector<string> &reserved_word, vector<string> &special_symbol, vector<char> &operators);
+/*
+  Function: get_tokens
+  Input: string w, which is the input statement from user
+         the vectors to store the tokens including number, identifier, reserved_word, special_symbol, operators
+  Output: Print out each token with its type
+  Description:
+    - Declare string variable named var to store the current token
+    - Parse the string w from left to right character by character
+      - If the character is one of the digits
+        - As long as the next character is either a number, a letter or underscore, keep adding those characters to var
+	- Check every single charater in var to see if all of them are numbers.
+	  - If they are, then this token is a number, print it out and add it to the number vector.
+	  - Else, it is not identifier ( which is an error ), print it out.
+     
+      - If the character is a letter or underscore
+        - Keep looping and adding the next characters to var as long as they are either a digit, a letter or underscore.
+	- If var is "cout", check the next two characters to see if they are "<<".
+	   - If they are, then this token is a reserved_word, print it out and add it to the reserved_word vector.
+        - Loop through each items in the array Reserved_Word to see if var is one of them.
+           - If it is, then the token is a reserved_word, print it out and add it to the reserved_word vector.
+           - Else, the token is an idenfifier, print it out and add it to the idendifier vector.
+
+      - Loop through each items in the array Special to see if the character is one of them
+         - If it is, then the token is a special symbol, print it out and add it to the special_symbol vector.
+
+      - If the character is one of the operators ( +, -, *, /), print it out and add it tho the operators vector.
+	  
+
+ */
+void get_tokens(string w, vector<int> & number, vector<string> &identifier, vector<string> &reserved_word, 
+                vector<string> &special_symbol, vector<char> &operators);
 
 int main() { 
   char option = 'y';  /* variable to get option from user, 
@@ -38,7 +78,9 @@ int main() {
   return 0;
 }
 
-void get_tokens(string w, vector<int> & number, vector<string> &identifier, vector<string> &reserved_word, vector<string> &special_symbol, vector<char> &operators) {
+/* Implementation of function get_tokens */
+void get_tokens(string w, vector<int> & number, vector<string> &identifier, vector<string> &reserved_word, 
+                vector<string> &special_symbol, vector<char> &operators) {
 
   string var = "";
   int i, j;
@@ -113,7 +155,7 @@ void get_tokens(string w, vector<int> & number, vector<string> &identifier, vect
       var = "";
     }
 
-    // Check the special symbol
+    // Check for the special symbol
     if ( w[i] == '<' ) {
       var = var + w[i];
       i++;
