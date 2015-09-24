@@ -1,0 +1,58 @@
+duydo@duydo-Lenovo-H430:~/Documents/323/CPSC323/Assignment3$ ./a.out 
+Enter a statement: for(int tom_jones=22;tom_jones<=100;tom_jones=tom+1)cout<<2tom;
+for		reserved word
+(		special symbol
+int		reserved word
+tom_jones		identifier
+=		special symbol
+22		number
+;		special symbol
+tom_jones		identifier
+<=		special symbol
+100		number
+;		special symbol
+tom_jones		identifier
+=		special symbol
+tom		identifier
++		operator
+1		number
+)		special symbol
+cout<<		reserved word
+2tom		not identifier
+;		special symbol
+Continue(y/n)? y
+Enter a statement: int I=5; while(I<=10) cout<<myEye;
+int		reserved word
+I		identifier
+=		special symbol
+5		number
+;		special symbol
+while		reserved word
+(		special symbol
+I		identifier
+<=		special symbol
+10		number
+)		special symbol
+cout<<		reserved word
+myEye		identifier
+;		special symbol
+Continue(y/n)? y
+Enter a statement: int a = 4; int b = 7; cout<<a+b;
+int		reserved word
+a		identifier
+=		special symbol
+4		number
+;		special symbol
+int		reserved word
+b		identifier
+=		special symbol
+7		number
+;		special symbol
+cout<<		reserved word
+a		identifier
++		operator
+b		identifier
+;		special symbol
+Continue(y/n)? n
+duydo@duydo-Lenovo-H430:~/Documents/323/CPSC323/Assignment3$ g++ Question1.cpp 
+
