@@ -26,38 +26,60 @@ const string Special[TOTAL_SPECIAL] = {"=", "_", "*", ";", "(", ")", "<=", "<", 
 /*
   Function: get_tokens
   Input: string w, which is the input statement from user
-         the vectors to store the tokens including number, identifier, reserved_word, special_symbol, operators
-  Output: Print out each token with its type
+         a vector to store all of the tokens 
+  Output: None.
+
   Description:
     - Declare string variable named var to store the current token
     - Parse the string w from left to right character by character
+      - Whenenver we encounter "//" in the string, skip the rest of the string because it is a comment
       - If the character is one of the digits
         - As long as the next character is either a number, a letter or underscore, keep adding those characters to var
 	- Check every single charater in var to see if all of them are numbers.
-	  - If they are, then this token is a number, print it out and add it to the number vector.
-	  - Else, it is not identifier ( which is an error ), print it out.
+	  - If they are, then this token is a number. Add the token to the vector 
+	  - Else, it is not identifier ( which is an error ). Add the token to the vector
      
       - If the character is a letter or underscore
         - Keep looping and adding the next characters to var as long as they are either a digit, a letter or underscore.
 	- If var is "cout", check the next two characters to see if they are "<<".
-	   - If they are, then this token is a reserved_word, print it out and add it to the reserved_word vector.
+	   - If they are, then this token is a reserved_word. Add the token to the vector
         - Loop through each items in the array Reserved_Word to see if var is one of them.
-           - If it is, then the token is a reserved_word, print it out and add it to the reserved_word vector.
-           - Else, the token is an idenfifier, print it out and add it to the idendifier vector.
+           - If it is, then the token is a reserved_word. Add the token to the vector
+           - Else, the token is an idenfifier. Add the token to the vector
 
       - Loop through each items in the array Special to see if the character is one of them
-         - If it is, then the token is a special symbol, print it out and add it to the special_symbol vector.
+         - If it is, then the token is a special symbol. Add the token to the vector
 
-      - If the character is one of the operators ( +, -, *, /), print it out and add it tho the operators vector.
+      - If the character is one of the operators ( +, -, *, /). Add the token to the vector
 	  
 
  */
 void get_tokens(string w, vector<string> &tokens);
+
+/*
+  Function: add_token_to_list
+  Input: reference to the token
+         reference to the tokens vector that contains all of the tokens
+  Output: None.
+  Description:
+     - Add the token to the end of the list
+     - Set the value of token to an empty string.
+ */
 void add_token_to_list( string &token, vector<string>& tokens);
 
+/*
+
+  Function: main
+  Description:
+     - Open the data.txt file to read in data.
+     - Read the file line by line
+        - call function get_tokens to parse the line and get all of the tokens in that line
+     - Open the file newdata.txt and write all of the tokens into that file
+        - Iterate through the tokens vector and write them out to the file
+           - If the token is ";", then add a new line.
+ */
 int main() { 
-  char option = 'y';  /* variable to get option from user, 
-							either continue with another expression or stop */
+
   string statement = "";
   vector<string> tokens;
 
@@ -104,7 +126,6 @@ void get_tokens(string w, vector<string> &tokens) {
   string token;
   
   for ( i = 0; i < w.length(); i++ ) {
-
 
     // Get rid of comment from the file
 
@@ -220,6 +241,7 @@ void get_tokens(string w, vector<string> &tokens) {
 
 }
 
+/* Implementation of function add tokens_to_list */
 void add_token_to_list( string &token, vector<string>& tokens) {
 
   tokens.push_back(token);
