@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <stack>
+#include <vector>
 
 using namespace std;
 
@@ -54,16 +55,23 @@ int main(){
   string input;
   char w;
   stack<char> my_stack;
+  vector<char> stack_content; // use this to print out the content of the stack
+  vector<char>::iterator it;
   char s;
   int row = 0;
   int col = 0;
   int counter = 0;
   string content;
 
-  cout <<"Enter the input string: "<<endl;
+  cout <<"Enter the input string: ";
   getline(cin, input);
   my_stack.push('$');
   my_stack.push('E');
+
+  // For the purpose of printing the stack
+  stack_content.push_back('$');
+  stack_content.push_back('E');
+  
   w = input[counter];
   col = get_column(w);
   while ( !my_stack.empty() ) {
@@ -72,9 +80,16 @@ int main(){
     s = my_stack.top();
     my_stack.pop();
 
-    // Compare s with the current input character
+    //Keep track of the content in the stack
+    stack_content.pop_back();
+
+    // current token matches with s
     if ( s == w ) {
 
+      // Print out the content of the stack from stack_content
+      for ( it = stack_content.begin(); it != stack_content.end(); it++) cout << *it <<" ";
+      cout <<endl;
+      
       // This is the last character
       if ( s == '$' ) {
 	cout << "Accepted"<<endl;
@@ -85,11 +100,19 @@ int main(){
 	counter++;
 	w = input[counter];
 	col = get_column(w);
+	if ( col < 0 ) {
+	  cout << "Input error, rejected!"<< endl;
+	  return -1;
+	}
 	continue;
       }
     }
     
     row = get_row (s);
+    if ( row  < 0 ) {
+      cout << "Input error, rejected!"<< endl;
+      return -1;
+    }
 
     // Get the content in the table based on the row and column
     content = Table[row][col];
@@ -107,6 +130,7 @@ int main(){
     else {
       for ( int i = content.length()-1; i >= 0; i-- ) {
 	my_stack.push(content[i]);
+	stack_content.push_back(content[i]);
       }
     }
     
