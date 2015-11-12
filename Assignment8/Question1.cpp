@@ -37,6 +37,8 @@ string lrtable[16][11] =
 	{ "", "r7", "r7", "r7", "r7", "", "r7", "r7", "", "", "" }  //15
 };
 
+const string rules[8] = { "E -> E+T", "E -> E-T", "E -> T", "T -> T*F",
+"T -> T/F", "T -> F", "F -> (E)", "F -> i" };
 
 int getcol(char input)
 {
@@ -64,7 +66,7 @@ int getcol(char input)
 		break;
 	case 'F': return F;
 		break;
-	default: cout << input << " error\n";
+	default: return -1;
 		break;
 	}
 }
@@ -93,7 +95,7 @@ void output(deque<int> mydeque, queue<char> input, string entry)
 		cout << inputqueue.front();
 		inputqueue.pop();
 	}
-	cout << " Entry: " << entry << endl;
+	cout << " Entry: " << entry;
 }
 
 
@@ -107,17 +109,18 @@ int main()
 	string entry;
 	int state = 0, temp;
 	char nt;
-	for (int i = 0; i < problem1.size(); i++) //initialize queue
+	for (int i = 0; i < problem1.size(); i++) //initialize queue. To change between strings, switch the number
 	{
 		input.push(problem1[i]);
 	}
 	
-	while (state != 100)
+	while (state != -1)
 	{
 		state = mydeque.back();
 		entry = table(state, getcol(input.front()));
 		output(mydeque, input, entry);
-		if (entry == "") //if table value is empt0y, return error
+
+		if (entry == "") //if table value is empty, return error
 		{
 			cout << "Error, empty table value\n";
 			break;
@@ -125,7 +128,7 @@ int main()
 
 		if (entry == "acc")
 		{
-			cout << "Accepted.\n";
+			cout << "\nAccepted.\n";
 			break;
 		}
 
@@ -137,16 +140,18 @@ int main()
 		{
 			temp = entry[1] - '0';
 		}
+		cout << " Action/Production: ";
 
 		if (entry[0] == 's') //go to state
 		{
+			cout << "Shift, enter State " << temp << endl;
 			mydeque.push_back(input.front());
 			input.pop();
 			mydeque.push_back(temp);
-			//state = mydeque.front();
 		}
 		else if (entry[0] == 'r') //go to rule
 		{
+			cout << rules[temp - 1] << endl;
 			if (temp > 6) nt = 'F';
 			else if (temp > 3) nt = 'T';
 			else nt = 'E';
