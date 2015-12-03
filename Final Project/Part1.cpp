@@ -17,6 +17,7 @@
 #include <cstring>
 #include <fstream>
 #include <stack>
+#include "generator.h"
 using namespace std;
 
 const int TOTAL_RESERVED_WORD = 6;
@@ -116,6 +117,7 @@ int main() {
 
   inFile.close();
   outFile.close();
+  translate(tokens);
   return 0;
 }
 
