@@ -6,7 +6,7 @@ char convert_reserved_word ( string reserved ) {
   if (reserved == "program") return 'p';
   else if ( reserved == "var" ) return 'v';
   else if ( reserved == "begin") return 'b';
-  else if ( reserved == "end" ) return 'e';
+  else if ( reserved == "end." ) return 'e';
   else if ( reserved == "integer" ) return 't';
   else if ( reserved == "write" ) return 'w';
 
