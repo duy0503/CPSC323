@@ -1,6 +1,35 @@
 #include "parser.h"
 using namespace std;
 
+/*
+program id num integer + - * / ( ) : Åg write ; end. 
+i = identifier
+n = number
+s = string
+*/
+
+string table[16][15] = 
+{
+	{ "p i ; v 1 b 5 e", "", "", "", "", "", "", "", "", "", "", "", "", "", "" }, // program
+	{ "", "<dec> : <type> ;", "", "", "", "", "", "", "", "", "", "", "", "", "" }, // dec-list
+	{ "", "id X", "", "", "", "", "", "", "", "", "", "", "", "", "" }, // dec
+	{ "", ", <dec>", "", "", "", "", "", "", "", "", "É…", "", "", "", "" }, // X
+	{ "", "", "", "integer", "", "", "", "", "", "", "", "", "", "", "" }, // type
+	{ "", "<stat> Y", "", "", "", "", "", "", "", "", "", "", "<stat> Y", "", "" }, // stat-list
+	{ "", "<stat-list>", "", "", "", "", "", "", "", "", "", "", "<stat-list>", "", "lambda" }, // Y
+	{ "", "<assign>", "", "", "", "", "", "", "", "", "", "", "<write>", "", "" }, // stat
+	{ "", "", "", "", "", "", "", "", "", "", "", "", "write ( <str> id ) ;", "", "" }, // write
+	{ "", "lambda", "", "", "", "", "", "", "", "", "", "s ,", "", "", "" }, // str
+	{ "", "id = <expr> ;", "", "", "", "", "", "", "", "", "", "", "", "", "" }, // assign
+	{ "", "<term> Z", "<term> Z", "", "", "", "", "", "<term> Z", "", "", "", "", "", "" }, // expr
+	{ "", "", "", "", "+ <expr>", "- <expr>", "", "", "", "lambda", "", "", "", "lambda", "" }, // Z
+	{ "", "<factor> <termprime>", "<factor> <termprime>", "", "", "", "", "", "<factor> <termprime>", "", "", "", "", "", "" }, // term
+	{ "", "", "", "", "lambda", "lambda", "* <factor> <termprime>", "/ <factor> <termprime>", "", "lambda", "", "", "", "lambda", "" }, // term prime
+	{ "", "id", "num", "", "", "", "", "", "( <expr> )", "", "", "", "", "", "" } // factor
+};
+
+
+
 char convert_reserved_word ( string reserved ) {
 
   if (reserved == "program") return 'p';
