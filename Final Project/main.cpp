@@ -17,6 +17,6 @@ int main() {
 
   // Get tokens from the new txt files
   pass = parse(tokens);
-  translate(tokens);
+  if ( pass ) translate(tokens);
   return 0;
 }
