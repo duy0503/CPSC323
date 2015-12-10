@@ -10,10 +10,12 @@
 #include <fstream>
 #include <stack>
 using namespace std;
+
 const int TOTAL_RESERVED_WORD = 6;
 const int TOTAL_SPECIAL  = 9;
 const string Reserved_Word[TOTAL_RESERVED_WORD] = {"program", "var", "begin", "end.", "integer", "write"};
 const string Special[TOTAL_SPECIAL] = {"=", "_", ";", "(", ")", "<", ">", ",", ":"};
 
 #define LOG_FILE 0  // used for debugging
+
 #endif

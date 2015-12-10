@@ -1,11 +1,4 @@
-#include <iostream>
-#include <string>
-#include <ctype.h>
-#include <vector>
-#include <stdlib.h>
-#include <cstring>
-#include <fstream>
-#include <stack>
+
 #include "generator.h"
 
 void translate(vector<string> tokens) {

@@ -346,6 +346,12 @@ bool check(vector<char> tokens) {
   current_it = tokens.begin();
   w = *current_it;
   col = get_column(w);
+
+  if ( col < 0 ) {
+    cout << "Token " << w << " is not valid"<<endl;
+    cout << "Rejected!"<< endl;
+    return false;
+  }
   while ( !my_stack.empty() ) {
     
     //Get the top of the stack
@@ -386,6 +392,7 @@ bool check(vector<char> tokens) {
     row = get_row (s);
     if ( row  < 0 ) {
       if ( w == '(' ) cout << "write is missing" <<endl;
+      else if ( w == ')' ) cout << "( is missing" <<endl;
       else  cout << s << " is missing" << endl;
       cout << "Rejected!"<< endl;
       return false;
