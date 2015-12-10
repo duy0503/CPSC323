@@ -7,6 +7,5 @@ using namespace std;
 bool check(vector<char> tokens);
 bool parse(vector<string> tokens);
 vector<char> get_tokens_lists(vector<string> tokens, vector<string> &id, vector<string> &num, vector<string> &reserved);
-char convert_reserved_word ( string reserved );
 void get_error(char non_term, char term);
 #endif

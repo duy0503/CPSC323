@@ -2,16 +2,38 @@
 using namespace std;
 
 /*
-program id num integer + - * / ( ) : g write ; end. 
-i = identifier
-n = number
-s = string
+
+To make the table smaller, we convert the big parsing table to a smaller table with new grammar
+A -> p i ; v B b C e                   where:      A = <prog>
+B -> D : t ;                                       B = <dec-list>
+D -> i X                                           C = <stat-list>
+X -> , D                                           D = <dec>
+X -> LAMBDA                                        E = <stat>
+C -> E L                                           F = <write>
+L -> C                                             H = <str>
+L -> LAMBDA                                        I = <expr>
+E -> F | G                                         G = <assign>       
+F -> w ( H i ) ;                                   T = <term>
+H -> s , | LAMBDA                                  Q = <factor>
+G -> i = I;                                        N = <number>
+I -> T Z                                           S = <sign>
+Z -> + I
+Z -> - I                                           n = <digit>  , this is verified by function check_number
+Z -> LAMBDA                                        i = <identifier> , this is verified by function check_identifier   
+T -> K Q                                           p = program , reserved words are verified by function check_reserved_word
+Q -> * K Q                                         v = var
+Q -> / K Q                                         b = begin
+Q -> LAMBDA                                        e = end.
+K -> i | N | ( I )                                 w = write
+N -> S n                                           s = "what ever" , this is verified by function check_string
+S -> + | - | LAMBDA
 */
 
+// LL table used to parse all of the tokens
 string Table[17][20] = 
 {
         // p            i      ;    v     b     e    +   -     *      /    =    (      )    w         n    s    $    ,    :   t
-  "pi;vBbCe"        , ""    , "" , ""  , "",  "" ,  " ",  "" , ""  , ""  , "" , "" , ""   , ""      , ""  , "" , "", "" , ""  , "",// A
+  "pi;vBbCe"        , ""    , "" , ""  , "",  "" ,  " ",  "" , ""  , ""  , "" , "" , ""   , ""      , ""  , "" , "", "" , ""  ,  "",// A
    ""               , "D:t;", "" , ""  , "", ""  , ""  , ""  , ""  , ""  , "" , "" , ""   , ""      , ""  ,""  ,"" , "" , ""  ,  "",// B
    ""               , "EL"  , "" , ""  , "", ""  , ""  , ""  , ""  , ""  , "" , "" , ""   , "EL"    , ""  , "" ,"" , "" , ""  ,  "",// C
    ""               , "iX"  , "" , ""  , "", ""  , ""  , ""  , ""  , ""  , "" , "" , ""   , ""      , ""  , "" ,"" , "" , ""  ,  "",// D
@@ -20,9 +42,9 @@ string Table[17][20] =
    ""               , "i=I;", "" , ""  , "", ""  , ""  , ""  , ""  , ""  , "" , "" , ""   , ""      , ""  , "" ,"" , "" , ""  ,  "",// G
    ""               , "#"   , "" , ""  , "", ""  , ""  , ""  , ""  , ""  , "" , "" , ""   , ""      , ""  ,"s,","" , "" , ""  ,  "",// H
    ""               , "TZ"  , "" , ""  , "", ""  , "TZ", "TZ", ""  , ""  , "" ,"TZ", ""   , ""      , "TZ", "" ,"" , "" , ""  ,  "",// I
-   ""               , "#"   , "#", ""  , "", ""  , "+I", "-I", ""  , ""  , "" , "" , "#"  , ""      , ""  , "" ,"" , "" , ""  ,  "",// Z
+   ""               , "#"   , "#", ""  , "", ""  , "+I", "-I", ""  , ""  , "" , "" , "#"  , "#"     , ""  , "" ,"" , "" , ""  ,  "",// Z
    ""               , "KQ"  , "" , ""  , "", ""  , "KQ", "KQ", ""  , ""  , "" ,"KQ", ""   , ""      , "KQ", "" ,"" , "" , ""  ,  "",// T
-   ""               , "#"   , "#", ""  , "", ""  , "#" , "#" ,"*KQ","/KQ", "" , "" , "#"  , ""      , ""  , "" ,"" , "" , ""  ,  "",// Q
+   ""               , "#"   , "#", ""  , "", ""  , "#" , "#" ,"*KQ","/KQ", "" , "" , "#"  , "#"     , ""  , "" ,"" , "" , ""  ,  "",// Q
    ""               , "i"   , "" , ""  , "", ""  , "N" , "N" , ""  , ""  , "" ,"(I)", ""  , ""      , "N" , "" ,"" , "" , ""  ,  "",// K
    ""               , ""    , "" , ""  , "", ""  , "+" , "-" , ""  , ""  , "" , ""  , ""  , ""      , "#" , "" ,"" , "" , ""  ,  "",// S
    ""               , ""    , "" , ""  , "", ""  , "Sn", "Sn", ""  , ""  , "" , ""  , ""  , ""      , "Sn", "" ,"" , "" , ""  ,  "",// N
@@ -30,6 +52,12 @@ string Table[17][20] =
   ""                , ""    , "" , ""  , "", ""  , ""  , ""  , ""  , ""  , "" , ""  , ""  , ""      , ""  , "" ,"" ,",D", "#" , ""  // X
 };
 
+// FA table used to verify the identifier
+int ID_Table[3][3] = { 1, 2, 2,
+		       1, 1, 2,
+		       2, 2, 2};
+
+// Array used to check the reserved list
 bool reserved_word_used[6] = { false, false, false, false, false, false};
 
 static bool check_number(vector<string> num) {
@@ -48,8 +76,9 @@ static bool check_number(vector<string> num) {
     }
   }
   return true;
-
 }
+
+
 static bool check_string(vector<string> s ) {
 
   string current;
@@ -60,13 +89,10 @@ static bool check_string(vector<string> s ) {
       cout << "Token string is not correct, \" is missing" << endl;
       return false;
     }
-
   }
-
-  return true;
-  
-
+  return true;  
 }
+
 static bool check_reserved_word(vector<string> reserved) {
 
   vector<string>::iterator it;
@@ -86,6 +112,35 @@ static bool check_reserved_word(vector<string> reserved) {
   }
   return true;
 }
+
+static bool check_identifier(vector<string> id ) {
+
+  string current_id;
+  int state = 0, i, col;
+  char w;
+  for ( vector<string>::iterator it = id.begin(); it != id.end(); it++) {
+
+    i = 0;
+    current_id = *it + "$";
+    while ( i < current_id.length() ) {
+      if ( current_id[i]=='a' || current_id[i]=='b' || current_id[i]=='c' || current_id[i]=='d' ) col = 0;
+      else if ( isdigit(current_id[i]) ) col = 1;
+      else if ( current_id[i] =='$' ) {
+	if (state==2){
+	  cout << "Token " << *it <<" is not an identifier"<<endl;
+	  cout << "Rejected"<<endl;
+	  return false;
+	};
+      }
+      else col = 2;
+
+      state = ID_Table[state][col];
+      ++i;
+    }
+  }
+  return true;
+}
+
 
 static int get_column(char w){
   switch(w) {
@@ -175,7 +230,7 @@ static int get_row(char w) {
   }
 }
 
-char convert_reserved_word ( string reserved ) {
+static char convert_reserved_word ( string reserved ) {
 
   if (reserved == "program") return 'p';
   else if ( reserved == "var" ) return 'v';
@@ -241,7 +296,7 @@ bool parse(vector<string> tokens){
   vector<char> new_tokens;
   new_tokens = get_tokens_lists(tokens, id, num, reserved, str);
   
-#if LOG_FILE==1
+#if LOG_FILE==1  // used for debugging purpose
   vector<string>::iterator it;
   for ( it = id.begin(); it != id.end(); it++) cout<< *it <<" ";
   cout<<endl;
@@ -262,6 +317,7 @@ bool parse(vector<string> tokens){
   if ( !check_reserved_word(reserved)) return false;
   if ( !check_string(str) ) return false;
   if ( !check_number(num) ) return false;
+  if ( !check_identifier(id) ) return false;
   if ( !check(new_tokens) ) return false;
   return true;
 
@@ -302,7 +358,7 @@ bool check(vector<char> tokens) {
     // current token matches with s
     if ( s == w ) {
 
-#if LOG_FILE==1
+#if LOG_FILE==1  // used for debugging purpose
       // Print out the content of the stack from stack_content
       for (  vector<char>::iterator it = stack_content.begin(); it != stack_content.end(); it++) cout << *it <<" ";
       cout <<endl;
@@ -310,6 +366,7 @@ bool check(vector<char> tokens) {
       // This is the last character
       if ( s == '$' ) {
 	cout << "Accepted"<<endl;
+	cout << "File is now translated to final.cpp"<<endl;
 	return true;
       }
       // If it's not the last character, read the next character in the input
@@ -368,7 +425,7 @@ void get_error(char non_term, char term) {
   }
   else {
     for ( int i = 0; i < 20; i++ ) {
-      content = Table[get_row(non_term)][get_column(term)];
+      content = Table[get_row(non_term)][i];
       if ( content != "" && content != "#" ) {
 	cout << content[0] << " is missing"<<endl;
       }
