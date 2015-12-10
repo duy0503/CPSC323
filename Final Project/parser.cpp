@@ -20,9 +20,9 @@ string Table[17][20] =
    ""               , "i=I;", "" , ""  , "", ""  , ""  , ""  , ""  , ""  , "" , "" , ""   , ""      , ""  , "" ,"" , "" , ""  ,  "",// G
    ""               , "#"   , "" , ""  , "", ""  , ""  , ""  , ""  , ""  , "" , "" , ""   , ""      , ""  ,"s,","" , "" , ""  ,  "",// H
    ""               , "TZ"  , "" , ""  , "", ""  , "TZ", "TZ", ""  , ""  , "" ,"TZ", ""   , ""      , "TZ", "" ,"" , "" , ""  ,  "",// I
-   ""               , ""    , "#", ""  , "", ""  , "+I", "-I", ""  , ""  , "" , "" , "#"  , ""      , ""  , "" ,"" , "" , ""  ,  "",// Z
+   ""               , "#"   , "#", ""  , "", ""  , "+I", "-I", ""  , ""  , "" , "" , "#"  , ""      , ""  , "" ,"" , "" , ""  ,  "",// Z
    ""               , "KQ"  , "" , ""  , "", ""  , "KQ", "KQ", ""  , ""  , "" ,"KQ", ""   , ""      , "KQ", "" ,"" , "" , ""  ,  "",// T
-   ""               , ""    , "#", ""  , "", ""  , "#" , "#" ,"*KQ","/KQ", "" , "" , "#"  , ""      , ""  , "" ,"" , "" , ""  ,  "",// Q
+   ""               , "#"   , "#", ""  , "", ""  , "#" , "#" ,"*KQ","/KQ", "" , "" , "#"  , ""      , ""  , "" ,"" , "" , ""  ,  "",// Q
    ""               , "i"   , "" , ""  , "", ""  , "N" , "N" , ""  , ""  , "" ,"(I)", ""  , ""      , "N" , "" ,"" , "" , ""  ,  "",// K
    ""               , ""    , "" , ""  , "", ""  , "+" , "-" , ""  , ""  , "" , ""  , ""  , ""      , "#" , "" ,"" , "" , ""  ,  "",// S
    ""               , ""    , "" , ""  , "", ""  , "Sn", "Sn", ""  , ""  , "" , ""  , ""  , ""      , "Sn", "" ,"" , "" , ""  ,  "",// N
@@ -240,6 +240,8 @@ bool parse(vector<string> tokens){
   vector<string> str;
   vector<char> new_tokens;
   new_tokens = get_tokens_lists(tokens, id, num, reserved, str);
+  
+#if LOG_FILE==1
   vector<string>::iterator it;
   for ( it = id.begin(); it != id.end(); it++) cout<< *it <<" ";
   cout<<endl;
@@ -255,7 +257,8 @@ bool parse(vector<string> tokens){
     else cout <<*i <<" ";
   }
   cout << endl;
-
+#endif
+  
   if ( !check_reserved_word(reserved)) return false;
   if ( !check_string(str) ) return false;
   if ( !check_number(num) ) return false;
@@ -299,10 +302,11 @@ bool check(vector<char> tokens) {
     // current token matches with s
     if ( s == w ) {
 
+#if LOG_FILE==1
       // Print out the content of the stack from stack_content
       for (  vector<char>::iterator it = stack_content.begin(); it != stack_content.end(); it++) cout << *it <<" ";
       cout <<endl;
-      
+#endif 
       // This is the last character
       if ( s == '$' ) {
 	cout << "Accepted"<<endl;
@@ -314,7 +318,8 @@ bool check(vector<char> tokens) {
 	w = *current_it;
 	col = get_column(w);
 	if ( col < 0 ) {
-	  cout << "w rejected!"<< endl;
+	  cout << "Token " << w << " is not valid"<<endl;
+	  cout << "Rejected!"<< endl;
 	  return false;
 	}
 	continue;
@@ -323,9 +328,9 @@ bool check(vector<char> tokens) {
     
     row = get_row (s);
     if ( row  < 0 ) {
-      cout << "rejected!"<< endl;
       if ( w == '(' ) cout << "write is missing" <<endl;
       else  cout << s << " is missing" << endl;
+      cout << "Rejected!"<< endl;
       return false;
     }
 
@@ -334,10 +339,8 @@ bool check(vector<char> tokens) {
 
     // if the content is empty, reject the input
     if ( content.length() == 0 ) {
-      cout << s << endl;
-      cout << w << endl;
-      cout<<"error"<<endl;
       get_error(s,w);
+      cout << "Rejected"<<endl;
       return false;
     }
     // if it is lambda ( I put '#' for lambda in the table )
