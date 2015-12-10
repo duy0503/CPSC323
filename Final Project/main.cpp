@@ -8,9 +8,8 @@ int main() {
   vector<string> tokens;
   bool pass = false;
 
-  string file_v1;
-  cout<<"Enter file name: "<<endl;
-  getline(cin, file_v1);
+  string file_v1 = "finalv3.txt";
+
   // Clean up all of the comments
   // and create a new txt file from the original file
   tokens = clean_up(file_v1);

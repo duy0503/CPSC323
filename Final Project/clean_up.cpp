@@ -83,7 +83,7 @@ void remove_comments(string w, vector<string> &tokens, stack<int> &comment) {
     if ( w[i] == '"' ) {
 
       print_string.push('"');
-      while ( !print_string.empty()) {
+      while ( !print_string.empty() && i < w.length() ) {
 	token = token + w[i];
 	i++;
 	if ( w[i] == '"' ) {

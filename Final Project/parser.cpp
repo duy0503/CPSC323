@@ -11,7 +11,7 @@ s = string
 string Table[17][20] = 
 {
         // p            i      ;    v     b     e    +   -     *      /    =    (      )    w         n    s    $    ,    :   t
-  "pi;vBbCe"        , ""    , "" , ""  , "",  "" ,  " ",  "" , ""  , ""  , "" , "" , ""   , ""      , ""  , "" , "", "" , ""   , "",// A
+  "pi;vBbCe"        , ""    , "" , ""  , "",  "" ,  " ",  "" , ""  , ""  , "" , "" , ""   , ""      , ""  , "" , "", "" , ""  , "",// A
    ""               , "D:t;", "" , ""  , "", ""  , ""  , ""  , ""  , ""  , "" , "" , ""   , ""      , ""  ,""  ,"" , "" , ""  ,  "",// B
    ""               , "EL"  , "" , ""  , "", ""  , ""  , ""  , ""  , ""  , "" , "" , ""   , "EL"    , ""  , "" ,"" , "" , ""  ,  "",// C
    ""               , "iX"  , "" , ""  , "", ""  , ""  , ""  , ""  , ""  , "" , "" , ""   , ""      , ""  , "" ,"" , "" , ""  ,  "",// D
@@ -32,6 +32,41 @@ string Table[17][20] =
 
 bool reserved_word_used[6] = { false, false, false, false, false, false};
 
+static bool check_number(vector<string> num) {
+
+  string current;
+  for ( vector<string>::iterator it = num.begin(); it != num.end(); it++ ) {
+
+    current = *it;
+
+    for ( int i = 0; i < current.length(); i++ ) {
+
+      if ( !isdigit(current[i]) ) {
+	cout << current <<" is not a number. Rejected"<<endl;
+	return false;
+      }
+    }
+  }
+  return true;
+
+}
+static bool check_string(vector<string> s ) {
+
+  string current;
+  for ( vector<string>::iterator it = s.begin(); it != s.end(); it++ ) {
+
+    current = *it;
+    if ( current[0] != '"' || current[current.length()-1] != '"' ) {
+      cout << "Token string is not correct, \" is missing" << endl;
+      return false;
+    }
+
+  }
+
+  return true;
+  
+
+}
 static bool check_reserved_word(vector<string> reserved) {
 
   vector<string>::iterator it;
@@ -151,7 +186,7 @@ char convert_reserved_word ( string reserved ) {
 
 }
 
-vector<char> get_tokens_lists(vector<string> tokens, vector<string> &id, vector<string> &num, vector<string> &reserved){
+vector<char> get_tokens_lists(vector<string> tokens, vector<string> &id, vector<string> &num, vector<string> &reserved, vector<string> &str){
 
   string current;
   vector<string>::iterator it;
@@ -185,7 +220,10 @@ vector<char> get_tokens_lists(vector<string> tokens, vector<string> &id, vector<
     }
 
     // if token is a string
-    else if ( current[0] == '"' ) new_tokens.push_back('s');
+    else if ( current[0] == '"' ) {
+      new_tokens.push_back('s');
+      str.push_back(current);
+    }
 
     // if token is a special character
     else new_tokens.push_back(current[0]);
@@ -199,9 +237,9 @@ bool parse(vector<string> tokens){
   vector<string> id;
   vector<string> num;
   vector<string> reserved;
+  vector<string> str;
   vector<char> new_tokens;
-  bool accepted = false;
-  new_tokens = get_tokens_lists(tokens, id, num, reserved);
+  new_tokens = get_tokens_lists(tokens, id, num, reserved, str);
   vector<string>::iterator it;
   for ( it = id.begin(); it != id.end(); it++) cout<< *it <<" ";
   cout<<endl;
@@ -216,10 +254,13 @@ bool parse(vector<string> tokens){
     if ( *i == ';' ) cout << *i<<endl;
     else cout <<*i <<" ";
   }
+  cout << endl;
 
   if ( !check_reserved_word(reserved)) return false;
-  accepted = check(new_tokens);
-  return accepted;
+  if ( !check_string(str) ) return false;
+  if ( !check_number(num) ) return false;
+  if ( !check(new_tokens) ) return false;
+  return true;
 
 }
 
@@ -228,7 +269,6 @@ bool check(vector<char> tokens) {
   char w;
   stack<char> my_stack;
   vector<char> stack_content; // use this to print out the content of the stack
-  vector<char>::iterator it;
   vector<char>::iterator current_it;
   char s;
   int row = 0;
@@ -260,7 +300,7 @@ bool check(vector<char> tokens) {
     if ( s == w ) {
 
       // Print out the content of the stack from stack_content
-      for ( it = stack_content.begin(); it != stack_content.end(); it++) cout << *it <<" ";
+      for (  vector<char>::iterator it = stack_content.begin(); it != stack_content.end(); it++) cout << *it <<" ";
       cout <<endl;
       
       // This is the last character
@@ -284,7 +324,8 @@ bool check(vector<char> tokens) {
     row = get_row (s);
     if ( row  < 0 ) {
       cout << "rejected!"<< endl;
-      cout << s << " is missing" << endl;
+      if ( w == '(' ) cout << "write is missing" <<endl;
+      else  cout << s << " is missing" << endl;
       return false;
     }
 
@@ -293,8 +334,10 @@ bool check(vector<char> tokens) {
 
     // if the content is empty, reject the input
     if ( content.length() == 0 ) {
+      cout << s << endl;
+      cout << w << endl;
       cout<<"error"<<endl;
-      get_error(my_stack);
+      get_error(s,w);
       return false;
     }
     // if it is lambda ( I put '#' for lambda in the table )
@@ -307,25 +350,25 @@ bool check(vector<char> tokens) {
 	my_stack.push(content[i]);
 	stack_content.push_back(content[i]);
       }
-    }
-    
+    }    
   } 
  
   return true;
 }
 
-void get_error(stack<char> stack_content) {
+void get_error(char non_term, char term) {
 
-  char i;
-
-  while ( !stack_content.empty() ) {
-
-    i = stack_content.top();
-    stack_content.pop();
-    if ( (int) i < 65 || (int) i > 90 ) {
-      cout << i << " is missing"<<endl;
-      return;
+  string content;
+  if ( non_term == 'X' ) {
+    if ( term == 'i' ) cout << " , is missing" <<endl;
+    else if ( term == 't' ) cout << " : is missing" <<endl;
+  }
+  else {
+    for ( int i = 0; i < 20; i++ ) {
+      content = Table[get_row(non_term)][get_column(term)];
+      if ( content != "" && content != "#" ) {
+	cout << content[0] << " is missing"<<endl;
+      }
     }
   }
-
 }
